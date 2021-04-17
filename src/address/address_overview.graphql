@@ -1,0 +1,18 @@
+query AddressOverview(
+  $coin: String!
+  $address: String!
+) {
+  coin(name: $coin) {
+    name
+    address(address: $address) {
+      address
+      coin {
+        name
+      }
+      guestimatedWallet {
+        clusterId
+      }
+      unconfirmedTxCount
+    }
+  }
+}

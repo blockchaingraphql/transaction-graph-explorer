@@ -1,0 +1,27 @@
+query WalletAddresses(
+  $coin: String!
+  $address: String!
+  $limit: Int
+  $cursor: AddressCursor
+) {
+  coin(name: $coin) {
+    name
+    address(address: $address) {
+      address
+      coin {
+        name
+      }
+      guestimatedWallet {
+        clusterId
+        addresses(cursor: $cursor, limit: $limit) {
+          items {
+            address
+            coin {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}

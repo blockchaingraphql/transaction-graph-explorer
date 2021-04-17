@@ -1,0 +1,33 @@
+query AddressTransactions(
+  $coin: String!
+  $address: String!
+  $cursor: AddressTransactionCursor
+  $limit: Int
+) {
+  coin(name: $coin) {
+    name
+    address(address: $address) {
+      address
+      coin {
+        name
+      }
+      confirmedTransactions(limit: $limit, cursor: $cursor) {
+        items {
+          timestamp
+          height
+          txN
+          confirmedTransaction {
+            height
+            txN
+            txid
+            coin {
+                name
+            }
+          }
+          balanceChange
+          balanceAfterBlock
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+query block(
+  $coin: String!
+  $hash: String!
+  $cursor: ConfirmedTransactionCursor
+  $limit: Int
+) {
+  coin(name: $coin) {
+    name
+    block(hash: $hash) {
+      hash
+      txCount
+      coin {
+        name
+      }
+      transactions(limit: $limit, cursor: $cursor) {
+        items {
+          height
+          txid
+          transaction {
+            txid
+            coin {
+              name
+            }
+            inputCount
+            outputCount
+            fee
+          }
+          txN
+          coin {
+            name
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.MuiAutocomplete-groupLabel {
+    text-transform: capitalize !important;
+}

@@ -1,0 +1,13 @@
+query transactionById2($coin: String!, $txid: String!) {
+  coin(name: $coin) {
+    name
+    transaction(txid: $txid) {
+      txid
+      inputCount
+      outputCount
+      coin {
+        name
+      }
+    }
+  }
+}

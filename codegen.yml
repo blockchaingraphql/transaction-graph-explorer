@@ -1,0 +1,17 @@
+overwrite: true
+schema: "https://blockchaingraphql.com"
+documents: "src/**/*.graphql"
+generates:
+  src/generated/graphql.tsx:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+      - typescript-apollo-client-helpers
+    config:
+      withRefetchFn: false
+      avoidOptionals: 
+        field: true
+        inputValue: true
+        object: false
+        defaultValue: true

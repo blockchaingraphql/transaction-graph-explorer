@@ -1,0 +1,50 @@
+query transactionById($coin: String!, $txid: String!) {
+  coin(name: $coin) {
+    name
+    transaction(txid: $txid) {
+      coin {
+        name
+      }
+      inputs(limit: 300) {
+        items {
+          spentOutput {
+            txid
+            n
+            spendingIndex
+            value
+            scriptPubKey {
+              addresses {
+                address
+                coin {
+                  name
+                }
+                guestimatedWallet {
+                  clusterId
+                }
+              }
+            }
+          }
+        }
+      }
+      outputs(limit: 300) {
+        items {
+          value
+          n
+          scriptPubKey {
+            addresses {
+              address
+              coin {
+                name
+              }
+              guestimatedWallet {
+                clusterId
+              }
+            }
+          }
+          spendingTxid
+          spendingIndex
+        }
+      }
+    }
+  }
+}

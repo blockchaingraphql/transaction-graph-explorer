@@ -1,0 +1,35 @@
+query transactionInputs($coin: String!, $txid: String!) {
+  coin(name: $coin) {
+    name
+    transaction(txid: $txid) {
+      txid
+      coin {
+        name
+      }
+      inputs {
+        items {
+          coinbase
+          spentOutput {
+            txid
+            n
+            value
+            scriptPubKey {
+              addresses {
+                address
+                coin {
+                  name
+                }
+                guestimatedWallet {
+                  clusterId
+                  coin {
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

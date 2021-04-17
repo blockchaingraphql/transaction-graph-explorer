@@ -1,0 +1,33 @@
+query WalletTransactions(
+  $coin: String!
+  $address: String!
+  $limit: Int
+  $cursor: ClusterTransactionCursor
+) {
+  coin(name: $coin) {
+    name
+    address(address: $address) {
+      address
+      coin {
+        name
+      }
+      guestimatedWallet {
+        clusterId
+        transactions(cursor: $cursor, limit: $limit) {
+          items {
+            confirmedTransaction {
+              txid
+              height
+              txN
+              coin {
+                name
+              }
+            }
+            timestamp
+            balanceChange
+          }
+        }
+      }
+    }
+  }
+}
