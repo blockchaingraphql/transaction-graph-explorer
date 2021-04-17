@@ -408,7 +408,6 @@ function TransactionForceGraph({
             linkCurvature={0}
             linkHoverPrecision={0}
             enableNodeDrag={true}
-            enableZoomPanInteraction={true}
             dagMode={"lr"}
             linkDirectionalParticles={particleCount}
             linkDirectionalParticleSpeed={particleSpeed}
