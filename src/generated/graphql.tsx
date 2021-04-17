@@ -790,6 +790,70 @@ export type TransactionByIdQuery = (
   )> }
 );
 
+export type CoinSearchNumberQueryVariables = Exact<{
+  coin: Scalars['String'];
+  query: Scalars['Int'];
+}>;
+
+
+export type CoinSearchNumberQuery = (
+  { __typename?: 'Query' }
+  & { coin: Maybe<(
+    { __typename?: 'Coin' }
+    & Pick<Coin, 'name'>
+    & { blockByHeight: Maybe<(
+      { __typename?: 'BlockHash' }
+      & Pick<BlockHash, 'height' | 'hash'>
+      & { coin: (
+        { __typename?: 'Coin' }
+        & Pick<Coin, 'name'>
+      ) }
+    )> }
+  )> }
+);
+
+export type CoinSearchStringQueryVariables = Exact<{
+  coin: Scalars['String'];
+  query: Scalars['String'];
+}>;
+
+
+export type CoinSearchStringQuery = (
+  { __typename?: 'Query' }
+  & { coin: Maybe<(
+    { __typename?: 'Coin' }
+    & Pick<Coin, 'name'>
+    & { address: (
+      { __typename?: 'Address' }
+      & Pick<Address, 'address'>
+      & { coin: (
+        { __typename?: 'Coin' }
+        & Pick<Coin, 'name'>
+      ), balances: (
+        { __typename?: 'PaginatedAddressBalanceResponse' }
+        & { items: Array<(
+          { __typename?: 'AddressBalance' }
+          & Pick<AddressBalance, 'balance' | 'timestamp'>
+        )> }
+      ) }
+    ), transaction: Maybe<(
+      { __typename?: 'Transaction' }
+      & Pick<Transaction, 'txid' | 'height'>
+      & { coin: (
+        { __typename?: 'Coin' }
+        & Pick<Coin, 'name'>
+      ) }
+    )>, block: Maybe<(
+      { __typename?: 'Block' }
+      & Pick<Block, 'hash' | 'height'>
+      & { coin: (
+        { __typename?: 'Coin' }
+        & Pick<Coin, 'name'>
+      ) }
+    )> }
+  )> }
+);
+
 export type SearchNumberQueryVariables = Exact<{
   query: Scalars['Int'];
 }>;
@@ -1369,6 +1433,111 @@ export function useTransactionByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
 export type TransactionByIdQueryHookResult = ReturnType<typeof useTransactionByIdQuery>;
 export type TransactionByIdLazyQueryHookResult = ReturnType<typeof useTransactionByIdLazyQuery>;
 export type TransactionByIdQueryResult = Apollo.QueryResult<TransactionByIdQuery, TransactionByIdQueryVariables>;
+export const CoinSearchNumberDocument = gql`
+    query coinSearchNumber($coin: String!, $query: Int!) {
+  coin(name: $coin) {
+    name
+    blockByHeight(height: $query) {
+      height
+      hash
+      coin {
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useCoinSearchNumberQuery__
+ *
+ * To run a query within a React component, call `useCoinSearchNumberQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCoinSearchNumberQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCoinSearchNumberQuery({
+ *   variables: {
+ *      coin: // value for 'coin'
+ *      query: // value for 'query'
+ *   },
+ * });
+ */
+export function useCoinSearchNumberQuery(baseOptions: Apollo.QueryHookOptions<CoinSearchNumberQuery, CoinSearchNumberQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CoinSearchNumberQuery, CoinSearchNumberQueryVariables>(CoinSearchNumberDocument, options);
+      }
+export function useCoinSearchNumberLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CoinSearchNumberQuery, CoinSearchNumberQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CoinSearchNumberQuery, CoinSearchNumberQueryVariables>(CoinSearchNumberDocument, options);
+        }
+export type CoinSearchNumberQueryHookResult = ReturnType<typeof useCoinSearchNumberQuery>;
+export type CoinSearchNumberLazyQueryHookResult = ReturnType<typeof useCoinSearchNumberLazyQuery>;
+export type CoinSearchNumberQueryResult = Apollo.QueryResult<CoinSearchNumberQuery, CoinSearchNumberQueryVariables>;
+export const CoinSearchStringDocument = gql`
+    query coinSearchString($coin: String!, $query: String!) {
+  coin(name: $coin) {
+    name
+    address(address: $query) {
+      address
+      coin {
+        name
+      }
+      balances {
+        items {
+          balance
+          timestamp
+        }
+      }
+    }
+    transaction(txid: $query) {
+      txid
+      coin {
+        name
+      }
+      height
+    }
+    block(hash: $query) {
+      hash
+      height
+      coin {
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useCoinSearchStringQuery__
+ *
+ * To run a query within a React component, call `useCoinSearchStringQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCoinSearchStringQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCoinSearchStringQuery({
+ *   variables: {
+ *      coin: // value for 'coin'
+ *      query: // value for 'query'
+ *   },
+ * });
+ */
+export function useCoinSearchStringQuery(baseOptions: Apollo.QueryHookOptions<CoinSearchStringQuery, CoinSearchStringQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CoinSearchStringQuery, CoinSearchStringQueryVariables>(CoinSearchStringDocument, options);
+      }
+export function useCoinSearchStringLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CoinSearchStringQuery, CoinSearchStringQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CoinSearchStringQuery, CoinSearchStringQueryVariables>(CoinSearchStringDocument, options);
+        }
+export type CoinSearchStringQueryHookResult = ReturnType<typeof useCoinSearchStringQuery>;
+export type CoinSearchStringLazyQueryHookResult = ReturnType<typeof useCoinSearchStringLazyQuery>;
+export type CoinSearchStringQueryResult = Apollo.QueryResult<CoinSearchStringQuery, CoinSearchStringQueryVariables>;
 export const SearchNumberDocument = gql`
     query searchNumber($query: Int!) {
   coins {

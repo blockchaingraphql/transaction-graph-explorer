@@ -21,6 +21,7 @@ import {
 } from "react-router-dom"
 import { Wallet } from "./wallet/Wallet"
 import { ClusterNode } from "./force-graph/models/ClusterNode"
+import { CoinSearch } from "./search/CoinSearch"
 
 const useStyles = makeStyles((theme) => ({
     link: {
@@ -116,7 +117,7 @@ export function Coin({ client }: { client?: ApolloClient<object> }) {
                 </Breadcrumbs>
                 <ApolloConsumer>
                     {(client: ApolloClient<object>) =>
-                        <GlobalSearch client={client} />
+                        <CoinSearch client={client} coin={coin} />
                     }
                 </ApolloConsumer>
             </div>

@@ -1,0 +1,12 @@
+query coinSearchNumber($coin: String!, $query: Int!) {
+  coin(name: $coin) {
+    name
+    blockByHeight(height: $query) {
+      height
+      hash
+      coin {
+        name
+      }
+    }
+  }
+}

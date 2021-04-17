@@ -1,0 +1,31 @@
+query coinSearchString($coin: String!, $query: String!) {
+  coin(name: $coin) {
+    name
+    address(address: $query) {
+      address
+      coin {
+        name
+      }
+      balances {
+        items {
+          balance
+          timestamp
+        }
+      }
+    }
+    transaction(txid: $query) {
+      txid
+      coin {
+        name
+      }
+      height
+    }
+    block(hash: $query) {
+      hash
+      height
+      coin {
+        name
+      }
+    }
+  }
+}
