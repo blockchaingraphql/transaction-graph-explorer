@@ -1,0 +1,23 @@
+query transactionOutput($coin: String!, $txid: String!, $n: Int!) {
+  coin(name: $coin) {
+    name
+    transactionOutput(txid: $txid, n: $n) {
+      txid
+      n
+      value
+      spendingTxid
+      spendingIndex
+      scriptPubKey {
+        addresses {
+          address
+          coin {
+            name
+          }
+          guestimatedWallet {
+            clusterId
+          }
+        }
+      }
+    }
+  }
+}

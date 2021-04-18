@@ -12,10 +12,10 @@ import { useState } from "react"
 import { AutoSizer, Dimensions, Size } from "react-virtualized"
 
 interface Props {
-    transactionsByTxid: Immutable.Map<string, TxNode>;
-    outputsByOutpoint: Immutable.Map<string, OutputNode>;
-    setTransactionsByTxid: React.Dispatch<React.SetStateAction<Immutable.Map<string, TxNode>>>;
-    setOutputsByOutpoint: React.Dispatch<React.SetStateAction<Immutable.Map<string, OutputNode>>>;
+    transactionsByTxid: Immutable.Map<string, TxNode>
+    outputsByOutpoint: Immutable.Map<string, OutputNode>
+    setTransactionsByTxid: React.Dispatch<React.SetStateAction<Immutable.Map<string, TxNode>>>
+    setOutputsByOutpoint: React.Dispatch<React.SetStateAction<Immutable.Map<string, OutputNode>>>
 }
 
 
@@ -33,7 +33,7 @@ function TabPanel(props: { children: any, index: number, value: any }) {
         >
             {value === index && (
                 <Box p={3}>
-                    <Typography>{children}</Typography>
+                    {children}
                 </Box>
             )}
         </div>

@@ -916,6 +916,39 @@ export type SearchStringQuery = (
   )> }
 );
 
+export type TransactionOutputQueryVariables = Exact<{
+  coin: Scalars['String'];
+  txid: Scalars['String'];
+  n: Scalars['Int'];
+}>;
+
+
+export type TransactionOutputQuery = (
+  { __typename?: 'Query' }
+  & { coin: Maybe<(
+    { __typename?: 'Coin' }
+    & Pick<Coin, 'name'>
+    & { transactionOutput: Maybe<(
+      { __typename?: 'TransactionOutput' }
+      & Pick<TransactionOutput, 'txid' | 'n' | 'value' | 'spendingTxid' | 'spendingIndex'>
+      & { scriptPubKey: (
+        { __typename?: 'ScriptPubKey' }
+        & { addresses: Maybe<Array<(
+          { __typename?: 'Address' }
+          & Pick<Address, 'address'>
+          & { coin: (
+            { __typename?: 'Coin' }
+            & Pick<Coin, 'name'>
+          ), guestimatedWallet: (
+            { __typename?: 'AddressCluster' }
+            & Pick<AddressCluster, 'clusterId'>
+          ) }
+        )>> }
+      ) }
+    )> }
+  )> }
+);
+
 export type TransactionInputsQueryVariables = Exact<{
   coin: Scalars['String'];
   txid: Scalars['String'];
@@ -1641,6 +1674,61 @@ export function useSearchStringLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
 export type SearchStringQueryHookResult = ReturnType<typeof useSearchStringQuery>;
 export type SearchStringLazyQueryHookResult = ReturnType<typeof useSearchStringLazyQuery>;
 export type SearchStringQueryResult = Apollo.QueryResult<SearchStringQuery, SearchStringQueryVariables>;
+export const TransactionOutputDocument = gql`
+    query transactionOutput($coin: String!, $txid: String!, $n: Int!) {
+  coin(name: $coin) {
+    name
+    transactionOutput(txid: $txid, n: $n) {
+      txid
+      n
+      value
+      spendingTxid
+      spendingIndex
+      scriptPubKey {
+        addresses {
+          address
+          coin {
+            name
+          }
+          guestimatedWallet {
+            clusterId
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useTransactionOutputQuery__
+ *
+ * To run a query within a React component, call `useTransactionOutputQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTransactionOutputQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTransactionOutputQuery({
+ *   variables: {
+ *      coin: // value for 'coin'
+ *      txid: // value for 'txid'
+ *      n: // value for 'n'
+ *   },
+ * });
+ */
+export function useTransactionOutputQuery(baseOptions: Apollo.QueryHookOptions<TransactionOutputQuery, TransactionOutputQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TransactionOutputQuery, TransactionOutputQueryVariables>(TransactionOutputDocument, options);
+      }
+export function useTransactionOutputLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TransactionOutputQuery, TransactionOutputQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TransactionOutputQuery, TransactionOutputQueryVariables>(TransactionOutputDocument, options);
+        }
+export type TransactionOutputQueryHookResult = ReturnType<typeof useTransactionOutputQuery>;
+export type TransactionOutputLazyQueryHookResult = ReturnType<typeof useTransactionOutputLazyQuery>;
+export type TransactionOutputQueryResult = Apollo.QueryResult<TransactionOutputQuery, TransactionOutputQueryVariables>;
 export const TransactionInputsDocument = gql`
     query transactionInputs($coin: String!, $txid: String!) {
   coin(name: $coin) {

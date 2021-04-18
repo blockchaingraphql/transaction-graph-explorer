@@ -8,7 +8,6 @@ import { ApolloClient, ApolloConsumer } from '@apollo/client'
 import * as Immutable from 'immutable'
 import { Block } from "./block/Block"
 import { Address } from "./address/Address"
-import { GlobalSearch } from "./search/GlobalSearch"
 import { Breadcrumbs, Link, makeStyles } from "@material-ui/core"
 import HomeIcon from '@material-ui/icons/Home'
 import {
@@ -22,6 +21,7 @@ import {
 import { Wallet } from "./wallet/Wallet"
 import { ClusterNode } from "./force-graph/models/ClusterNode"
 import { CoinSearch } from "./search/CoinSearch"
+import { TransactionOutput } from "./transaction-output/TransactionOutput"
 
 const useStyles = makeStyles((theme) => ({
     link: {
@@ -63,9 +63,10 @@ export function Coin({ client }: { client?: ApolloClient<object> }) {
 
     const outputClicked = useCallback(async (node: OutputNode, event: MouseEvent) => {
         if (event.button === 0) {//Left click
+            history.push("/" + coin + "/output/" + node.txid + "-" + node.n)
             //expandOutput(node);
         }
-    }, [])
+    }, [coin, history])
 
     const clusterClicked = useCallback(async (node: ClusterNode, event: MouseEvent) => {
         if (event.button === 0) {//Left click
@@ -125,6 +126,12 @@ export function Coin({ client }: { client?: ApolloClient<object> }) {
                 <Route path={`${match.path}/transaction/:txid`}>
                     <Transaction
                         transactionsByTxid={transactionsByTxid}
+                        outputsByOutpoint={outputsByOutpoint}
+                        setTransactionsByTxid={setTransactionsByTxid}
+                        setOutputsByOutpoint={setOutputsByOutpoint} />
+                </Route>
+                <Route path={`${match.path}/output/:txid-:n`}>
+                    <TransactionOutput transactionsByTxid={transactionsByTxid}
                         outputsByOutpoint={outputsByOutpoint}
                         setTransactionsByTxid={setTransactionsByTxid}
                         setOutputsByOutpoint={setOutputsByOutpoint} />
