@@ -20,7 +20,7 @@ export function TransactionOutput(props: Props) {
 
     const graphNode = props.outputsByOutpoint.get(txid + n)
 
-    const { data, loading, error } = useTransactionOutputQuery({ variables: { coin: coin, txid: txid, n: Number.parseInt(n) } })
+    const { data } = useTransactionOutputQuery({ variables: { coin: coin, txid: txid, n: Number.parseInt(n) } })
     const output = data?.coin?.transactionOutput
     if (!output) {
         return <div>Loading</div>

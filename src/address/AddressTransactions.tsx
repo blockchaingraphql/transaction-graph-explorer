@@ -36,7 +36,7 @@ export function AddressTransactions() {
             {({ onRowsRendered, registerChild }) => {
 
                 return <MuiVirtualizedTable
-                    ref={registerChild}
+                    registerChild={registerChild}
                     onRowsRendered={onRowsRendered}
                     rowCount={data!.coin!.address.confirmedTransactions.items.length}
                     rowGetter={(info) => {

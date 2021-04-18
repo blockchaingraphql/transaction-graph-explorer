@@ -38,22 +38,22 @@ const styles = (theme: Theme) => createStyles({
 })
 
 interface Props extends WithStyles<typeof styles> {
-    columns: { dataKey: string, numeric?: boolean, width: number, label: string, flexGrow?: number, flexShrink?: number }[];
-    rowHeight: number;
-    headerHeight: number;
-    onRowClick?: any;
-    cellContentRenderer?: TableCellRenderer;
-    rowCount: number;
-    rowGetter: (info: Index) => any;
-    ref?: React.LegacyRef<Table>;
-    onRowsRendered?: ((info: IndexRange & OverscanIndexRange) => void);
+    columns: { dataKey: string, numeric?: boolean, width: number, label: string, flexGrow?: number, flexShrink?: number }[]
+    rowHeight: number
+    headerHeight: number
+    onRowClick?: any
+    cellContentRenderer?: TableCellRenderer
+    rowCount: number
+    rowGetter: (info: Index) => any
+    registerChild?: (registeredChild: any) => void
+    onRowsRendered?: ((info: IndexRange & OverscanIndexRange) => void)
 }
 
 interface HeaderRendererProps extends TableHeaderProps {
-    columnIndex: number;
+    columnIndex: number
 }
 
-function VirtualizedTable({ columns, classes, rowHeight, headerHeight, onRowClick, rowCount, rowGetter, cellContentRenderer, ref, onRowsRendered }: Props) {
+function VirtualizedTable({ columns, classes, rowHeight, headerHeight, onRowClick, rowCount, rowGetter, cellContentRenderer, registerChild, onRowsRendered }: Props) {
 
     const getRowClassName = (info: Index): string => {
         if (info.index === -1) {
@@ -105,8 +105,8 @@ function VirtualizedTable({ columns, classes, rowHeight, headerHeight, onRowClic
     return <AutoSizer>
         {({ height, width }: Dimensions) => (
             <Table
+                ref={registerChild}
                 onRowsRendered={onRowsRendered}
-                ref={ref}
                 height={height}
                 width={width}
                 rowHeight={rowHeight}

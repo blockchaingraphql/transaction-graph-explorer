@@ -1,4 +1,4 @@
-import { Box, Card, CardActions, CardContent, CardHeader, IconButton, Paper, Tab, Tabs, Tooltip, Typography } from "@material-ui/core"
+import { Box, Card, CardActions, CardContent, CardHeader, IconButton, Paper, Tab, Tabs, Tooltip } from "@material-ui/core"
 import { useParams } from "react-router"
 import { useTransactionById2Query } from "../generated/graphql"
 import { TxNode } from "../force-graph/models/TxNode"

@@ -35,7 +35,7 @@ export function WalletAddresses() {
         >
             {({ onRowsRendered, registerChild }) => {
                 return <MuiVirtualizedTable
-                    ref={registerChild}
+                    registerChild={registerChild}
                     onRowsRendered={onRowsRendered}
                     rowCount={data!.coin!.address.guestimatedWallet.addresses.items.length}
                     rowGetter={(info) => {

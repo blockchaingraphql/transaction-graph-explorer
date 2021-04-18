@@ -17,6 +17,8 @@ const SOLID_LINE: [] = []
 function TransactionForceGraph({
     transactionsByTxid,
     outputsByOutpoint,
+    addressesById,
+    clustersById,
     transactionClicked,
     outputClicked,
     addressClicked,
@@ -27,6 +29,8 @@ function TransactionForceGraph({
 }: {
     transactionsByTxid: Immutable.Map<string, TxNode>,
     outputsByOutpoint: Immutable.Map<string, OutputNode>,
+    addressesById: Immutable.Map<string, AddressNode>,
+    clustersById: Immutable.Map<string, ClusterNode>,
     transactionClicked?: (node: TxNode, event: MouseEvent) => any,
     outputClicked?: (node: OutputNode, event: MouseEvent) => any,
     addressClicked?: (node: AddressNode, event: MouseEvent) => any,
@@ -41,41 +45,9 @@ function TransactionForceGraph({
         return { width: width, height: height }
     }, [width, height])
 
-    const addressesById: React.MutableRefObject<Immutable.Map<string, AddressNode>> = useRef(Immutable.Map())
-    const clustersById: React.MutableRefObject<Immutable.Map<string, ClusterNode>> = useRef(Immutable.Map())
 
-    const outputAddressesAndClusters = useMemo(() => {
-        let updatedAddresses = Immutable.Map<string, AddressNode>()
-        let updatedClusters = Immutable.Map<string, ClusterNode>()
-        let addressLinks: StringLink[] = []
-        let clusterLinks: StringLink[] = []
-        outputsByOutpoint
-            .filter(output => output.address)
-            .groupBy(output => output.address!.clusterId)
-            .forEach((outputs, clusterId) => {
-                let cn = new ClusterNode(clusterId)
-                if (clustersById.current.has(cn.id)) {
-                    cn = clustersById.current.get(cn.id)!
-                }
-                updatedClusters = updatedClusters.set(cn.id, cn)
-                outputs.groupBy(output => output.address!.address).forEach((outputs, address) => {
-                    let an = addressesById.current.get(address)
-                    if (an === undefined) {
-                        an = new AddressNode(address, clusterId)
-                    }
-                    updatedAddresses = updatedAddresses.set(an.id, an)
-                    clusterLinks.push(new StringLink({ source: an, target: cn }))
-                    outputs.forEach(output => {
-                        addressLinks.push(new StringLink({ source: output, target: an! }))
-                    })
-                })
-            })
-        if (!updatedAddresses.equals(addressesById.current)) addressesById.current = updatedAddresses
-        if (!updatedClusters.equals(clustersById.current)) clustersById.current = updatedClusters
-        return { updatedAddresses: addressesById.current, updatedClusters: clustersById.current, addressLinks: addressLinks, clusterLinks: clusterLinks }
-    }, [outputsByOutpoint])
 
-    const txLinks = useMemo(() => {
+    /*const txLinks = useMemo(() => {
         const txLinks: StringLink[] = []
         outputsByOutpoint.forEach((output) => {
             const sourceTx = transactionsByTxid.get(output.txid)
@@ -90,15 +62,54 @@ function TransactionForceGraph({
             }
         })
         return txLinks
-    }, [outputsByOutpoint, transactionsByTxid])
+    }, [outputsByOutpoint, transactionsByTxid])*/
 
     const links = useMemo(() => {
+        const result: StringLink[] = []
+        outputsByOutpoint
+            .filter(output => output.address)
+            .groupBy(output => output.address!.clusterId)
+            .forEach((outputs, clusterId) => {
+                let cn = new ClusterNode(clusterId)
+                if (clustersById.has(cn.id)) {
+                    cn = clustersById.get(cn.id)!
+                }
+                outputs
+                    .groupBy(output => output.address!.address)
+                    .forEach((outputs, address) => {
+                        let an = addressesById.get(address)
+                        if (an === undefined) {
+                            an = new AddressNode(address, clusterId)
+                        }
+                        result.push(new StringLink({ source: an, target: cn }))
+                        outputs.forEach(output => {
+                            result.push(new StringLink({ source: output, target: an! }))
+                        })
+                    })
+            })
+        outputsByOutpoint
+            .forEach((output) => {
+                const sourceTx = transactionsByTxid.get(output.txid)
+                if (sourceTx) {
+                    result.push(new OutputLink({ source: sourceTx, target: output }))
+                }
+                if (output.spending_txid) {
+                    const targetTx = transactionsByTxid.get(output.spending_txid)
+                    if (targetTx) {
+                        result.push(new InputLink({ source: output, target: targetTx }))
+                    }
+                }
+            })
+        return result
+    }, [outputsByOutpoint, transactionsByTxid, addressesById, clustersById])
+
+    /*const links = useMemo(() => {
         return txLinks.concat(outputAddressesAndClusters.addressLinks, outputAddressesAndClusters.clusterLinks)
-    }, [txLinks, outputAddressesAndClusters.addressLinks, outputAddressesAndClusters.clusterLinks])
+    }, [txLinks, outputAddressesAndClusters.addressLinks, outputAddressesAndClusters.clusterLinks])*/
 
     const nodes = useMemo(() => {
-        return transactionsByTxid.valueSeq().concat(outputsByOutpoint.valueSeq()).concat(outputAddressesAndClusters.updatedAddresses.valueSeq()).concat(outputAddressesAndClusters.updatedClusters.valueSeq()).toArray()
-    }, [transactionsByTxid, outputsByOutpoint, outputAddressesAndClusters.updatedAddresses, outputAddressesAndClusters.updatedClusters])
+        return transactionsByTxid.valueSeq().concat(outputsByOutpoint.valueSeq()).concat(addressesById.valueSeq()).concat(clustersById.valueSeq()).toArray()
+    }, [transactionsByTxid, outputsByOutpoint, addressesById, clustersById])
 
     const graph = useMemo(() => {
         nodes.forEach(node => node.inLinks.length = node.outLinks.length = 0)

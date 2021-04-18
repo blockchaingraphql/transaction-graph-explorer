@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { OutputNode } from "./force-graph/models/OutputNode"
 import { TxNode } from "./force-graph/models/TxNode"
 import { AddressNode } from "./force-graph/models/AddressNode"
@@ -41,6 +41,44 @@ export function Coin({ client }: { client?: ApolloClient<object> }) {
     const [outputsByOutpoint, setOutputsByOutpoint] = useState<Immutable.Map<string, OutputNode>>(Immutable.Map())//useReducer((state: Immutable.Map<string, OutputNode>, action: Immutable.Map<string, OutputNode>) => action, Immutable.Map<string, OutputNode>());
 
     const [transactionsByTxid, setTransactionsByTxid] = useState<Immutable.Map<string, TxNode>>(Immutable.Map())
+
+    //const [addressesById, setAddressesById] = useState<Immutable.Map<string, AddressNode>>(Immutable.Map())
+    //const [clustersById, setClustersById] = useState<Immutable.Map<string, ClusterNode>>(Immutable.Map())
+
+    const addressesById: React.MutableRefObject<Immutable.Map<string, AddressNode>> = useRef(Immutable.Map())
+    const clustersById: React.MutableRefObject<Immutable.Map<string, ClusterNode>> = useRef(Immutable.Map())
+
+    const outputAddressesAndClusters = useMemo(() => {
+        let updatedAddresses = Immutable.Map<string, AddressNode>()
+        let updatedClusters = Immutable.Map<string, ClusterNode>()
+        //let addressLinks: StringLink[] = []
+        //let clusterLinks: StringLink[] = []
+        outputsByOutpoint
+            .filter(output => output.address)
+            .groupBy(output => output.address!.clusterId)
+            .forEach((outputs, clusterId) => {
+                let cn = new ClusterNode(clusterId)
+                if (clustersById.current.has(cn.id)) {
+                    cn = clustersById.current.get(cn.id)!
+                }
+                updatedClusters = updatedClusters.set(cn.id, cn)
+                outputs.groupBy(output => output.address!.address).forEach((outputs, address) => {
+                    let an = addressesById.current.get(address)
+                    if (an === undefined) {
+                        an = new AddressNode(address, clusterId)
+                    }
+                    updatedAddresses = updatedAddresses.set(an.id, an)
+                    //clusterLinks.push(new StringLink({ source: an, target: cn }))
+                    outputs.forEach(output => {
+                        //addressLinks.push(new StringLink({ source: output, target: an! }))
+                    })
+                })
+            })
+        if (!updatedAddresses.equals(addressesById.current)) addressesById.current = updatedAddresses
+        if (!updatedClusters.equals(clustersById.current)) clustersById.current = updatedClusters
+        return { updatedAddresses: addressesById.current, updatedClusters: clustersById.current }
+    }, [outputsByOutpoint])
+
 
     let { coin } = useParams<{ coin: string }>()
 
@@ -156,6 +194,8 @@ export function Coin({ client }: { client?: ApolloClient<object> }) {
             {graphDimensions && <TransactionForceGraph
                 transactionsByTxid={transactionsByTxid}
                 outputsByOutpoint={outputsByOutpoint}
+                addressesById={outputAddressesAndClusters.updatedAddresses}
+                clustersById={outputAddressesAndClusters.updatedClusters}
                 transactionClicked={transactionClicked}
                 outputClicked={outputClicked}
                 addressClicked={addressClicked}

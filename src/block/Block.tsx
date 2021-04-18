@@ -47,7 +47,7 @@ export function Block() {
                     >
                         {({ onRowsRendered, registerChild }) => (
                             <MuiVirtualizedTable
-                                ref={registerChild}
+                                registerChild={registerChild}
                                 onRowsRendered={onRowsRendered}
                                 rowCount={data!.coin!.block!.transactions.items.length}
                                 rowGetter={(info) => {
