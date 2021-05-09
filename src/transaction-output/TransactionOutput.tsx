@@ -3,22 +3,16 @@ import { useParams } from "react-router"
 import { useTransactionOutputQuery } from "../generated/graphql"
 import AddIcon from '@material-ui/icons/Add'
 import RemoveIcon from '@material-ui/icons/Remove'
-import { OutputNode } from "../force-graph/models/OutputNode"
-import * as Immutable from 'immutable'
-import { TxNode } from "../force-graph/models/TxNode"
+import { OutputNode } from "../force-graph/models/nodes/OutputNode"
 import { Link } from "react-router-dom"
+import { useGraph } from "../hooks/useGraph"
 
-interface Props {
-    transactionsByTxid: Immutable.Map<string, TxNode>
-    outputsByOutpoint: Immutable.Map<string, OutputNode>
-    setTransactionsByTxid: React.Dispatch<React.SetStateAction<Immutable.Map<string, TxNode>>>
-    setOutputsByOutpoint: React.Dispatch<React.SetStateAction<Immutable.Map<string, OutputNode>>>
-}
 
-export function TransactionOutput(props: Props) {
+export function TransactionOutput() {
     let { txid, coin, n } = useParams<{ coin: string, txid: string, n: string }>()
 
-    const graphNode = props.outputsByOutpoint.get(txid + n)
+    const { graph, graphDispatch } = useGraph()
+    const graphNode = graph.outputsByOutpoint.get(txid + n)
 
     const { data } = useTransactionOutputQuery({ variables: { coin: coin, txid: txid, n: Number.parseInt(n) } })
     const output = data?.coin?.transactionOutput
@@ -32,8 +26,8 @@ export function TransactionOutput(props: Props) {
 
     const addButtonClicked = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         if (!output) return
-        props.setOutputsByOutpoint(props.outputsByOutpoint.set(txid + n,
-            new OutputNode({
+        graphDispatch({
+            type: "addOutput", node: new OutputNode({
                 txid: output.txid,
                 n: output.n,
                 value: output.value,
@@ -41,11 +35,12 @@ export function TransactionOutput(props: Props) {
                 spending_index: output.spendingIndex,
                 address: address
             })
-        ))
+        })
     }
 
     const removeButtonClicked = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        props.setOutputsByOutpoint(props.outputsByOutpoint.delete(txid + n))
+        if (graphNode) graphDispatch({ type: "removeOutput", node: graphNode })
+        //props.setOutputsByOutpoint(props.outputsByOutpoint.delete(txid + n))
     }
 
     return <Card style={{ flex: "1 1 auto", display: "flex", flexDirection: "column" }}>

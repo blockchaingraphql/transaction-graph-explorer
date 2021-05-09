@@ -6,7 +6,10 @@ import 'fontsource-roboto'
 import reportWebVitals from './reportWebVitals'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 import { AddressClusterAddressesArgs, AddressClusterTransactionsArgs, AddressConfirmedTransactionsArgs, BlockTransactionsArgs, PaginatedAddressResponse, PaginatedAddressTransactionResponse, PaginatedClusterTransactionResponse, PaginatedConfirmedTransactionResponse, TypedTypePolicies } from "./generated/graphql"
+import { enableES5, enableMapSet } from 'immer'
 
+enableES5()
+enableMapSet()
 
 const typePolicies: TypedTypePolicies = {
     Query: {

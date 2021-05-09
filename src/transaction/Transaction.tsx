@@ -1,22 +1,14 @@
 import { Box, Card, CardActions, CardContent, CardHeader, IconButton, Paper, Tab, Tabs, Tooltip } from "@material-ui/core"
 import { useParams } from "react-router"
 import { useTransactionById2Query } from "../generated/graphql"
-import { TxNode } from "../force-graph/models/TxNode"
-import { OutputNode } from "../force-graph/models/OutputNode"
-import * as Immutable from 'immutable'
+import { TxNode } from "../force-graph/models/nodes/TxNode"
 import AddIcon from '@material-ui/icons/Add'
 import RemoveIcon from '@material-ui/icons/Remove'
 import { TransactionInputs } from "./TransactionInputs"
 import { TransactionOutputs } from "./TransactionOutputs"
 import { useState } from "react"
 import { AutoSizer, Dimensions, Size } from "react-virtualized"
-
-interface Props {
-    transactionsByTxid: Immutable.Map<string, TxNode>
-    outputsByOutpoint: Immutable.Map<string, OutputNode>
-    setTransactionsByTxid: React.Dispatch<React.SetStateAction<Immutable.Map<string, TxNode>>>
-    setOutputsByOutpoint: React.Dispatch<React.SetStateAction<Immutable.Map<string, OutputNode>>>
-}
+import { useGraph } from "../hooks/useGraph"
 
 
 function TabPanel(props: { children: any, index: number, value: any }) {
@@ -41,7 +33,7 @@ function TabPanel(props: { children: any, index: number, value: any }) {
 }
 
 
-function TransactionCardContent(props: Props) {
+function TransactionCardContent() {
     let { coin, txid } = useParams<{ coin: string, txid: string }>()
     const [tabIndex, setTabIndex] = useState(0)
 
@@ -64,10 +56,10 @@ function TransactionCardContent(props: Props) {
                             {({ height, width }: Dimensions) => (
                                 <div style={{ height: height, width: "100%", overflow: 'auto' }}>
                                     <TabPanel value={tabIndex} index={0}>
-                                        <TransactionInputs {...props} />
+                                        <TransactionInputs />
                                     </TabPanel>
                                     <TabPanel value={tabIndex} index={1}>
-                                        <TransactionOutputs {...props} />
+                                        <TransactionOutputs />
                                     </TabPanel>
                                 </div>
                             )}
@@ -91,25 +83,28 @@ function TransactionCardContent(props: Props) {
     }
 }
 
-export function Transaction(props: Props) {
+export function Transaction() {
     let { txid } = useParams<{ coin: string, txid: string }>()
     //const txNode: TxNode = new TxNode(txid, false);
-    const graphNode = props.transactionsByTxid.get(txid)
+    const { graph, graphDispatch } = useGraph()
+    //const { transaction: graphNode } = useGraphTransaction({ txid: txid })
+    const graphNode = graph.transactionsByTxid.get(txid)
 
 
     const addButtonClicked = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        props.setTransactionsByTxid(props.transactionsByTxid.set(txid, new TxNode(txid, false)))
+        graphDispatch({ type: "addTransaction", node: new TxNode(txid, false) })
     }
 
     const removeButtonClicked = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        props.setTransactionsByTxid(props.transactionsByTxid.delete(txid))
+        if (graphNode) graphDispatch({ type: "removeTransaction", node: graphNode })
+        //props.setTransactionsByTxid(props.transactionsByTxid.delete(txid))
     }
 
     return <Card style={{ flex: "1 1 auto", display: "flex", flexDirection: "column" }}>
         <CardHeader title="TRANSACTION" subheader={txid} />
         <CardContent style={{ flex: "1 1 auto", display: "flex", flexDirection: "column" }}>
             <Paper style={{ flex: "1 1 auto", display: "flex", flexDirection: "column" }}>
-                <TransactionCardContent {...props} />
+                <TransactionCardContent />
             </Paper>
         </CardContent>
         <CardActions disableSpacing>
