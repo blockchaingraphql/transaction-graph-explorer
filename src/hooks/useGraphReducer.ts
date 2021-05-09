@@ -36,7 +36,6 @@ const addTransaction = (draft: Draft<Graph>, transaction: TxNode): void => {
     if (existingInputs) {
         for (const spentOutput of existingInputs) {
             const link = new InputLink({ source: spentOutput, target: transaction })
-            console.log("CREATING INPUTLINK", spentOutput, transaction)
             spentOutput.spentByLink = link
             transaction.inputs.add(link)
         }
@@ -45,7 +44,6 @@ const addTransaction = (draft: Draft<Graph>, transaction: TxNode): void => {
     if (existingOutputs) {
         for (const output of existingOutputs) {
             const link = new OutputLink({ source: transaction, target: output })
-            console.log("CREATING OUTPUTLINK")
             output.spentLink = link
             transaction.outputs.add(link)
         }
@@ -100,10 +98,8 @@ const addOutput = (draft: Draft<Graph>, output: OutputNode): void => {
             newAddress.outputs.add(addressLink)
             output.addressLink = addressLink
         } else {
-            console.log("CLUSTER EXISTS")
             const existingAddress = draft.addressesById.get(output.address.address)
             if (!existingAddress) {//Create address
-                console.log("CREATING ADDRESS")
                 const newAddress = new AddressNode(output.address.address, existingCluster)
                 draft.addressesById.set(output.address.address, newAddress)
                 const clusterLink = new ClusterLink({ source: newAddress, target: existingCluster })
@@ -126,7 +122,6 @@ const addOutput = (draft: Draft<Graph>, output: OutputNode): void => {
             txidIdToInputs = new Set()
             draft.txidToInputs.set(output.spending_txid, txidIdToInputs)
         }
-        console.log("ADDING INPUT FOR " + output.spending_txid)
         txidIdToInputs.add(output)
         const existingSpendingTransaction = draft.transactionsByTxid.get(output.spending_txid)//Add link
         if (existingSpendingTransaction) {
@@ -140,7 +135,6 @@ const addOutput = (draft: Draft<Graph>, output: OutputNode): void => {
         txidToOutputs = new Set()
         draft.txidToOutputs.set(output.txid, txidToOutputs)
     }
-    console.log("ADDING OUTPUT FOR " + output.txid)
     txidToOutputs.add(output)
     const existingTransaction = draft.transactionsByTxid.get(output.txid)
     if (existingTransaction) {
@@ -155,7 +149,6 @@ const removeOutput = (draft: Draft<Graph>, output: OutputNode): void => {
     draft.outputsByOutpoint.delete(output.id)
     if (output.spending_txid) {
         const txidIdToInputs = draft.txidToInputs.get(output.spending_txid)!
-        console.log("DELETING INPUT OF " + output.spending_txid)
         if (txidIdToInputs.size > 1) {
             txidIdToInputs.delete(output)
         } else {
@@ -164,7 +157,6 @@ const removeOutput = (draft: Draft<Graph>, output: OutputNode): void => {
     }
     if (output.txid) {
         const txidIdToOutputs = draft.txidToOutputs.get(output.txid)!
-        console.log("DELETING OUTPUT OF " + output.txid)
         if (txidIdToOutputs.size > 1) {
             txidIdToOutputs.delete(output)
         } else {
