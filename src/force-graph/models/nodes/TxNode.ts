@@ -1,13 +1,13 @@
 import { InputLink } from "../links/InputLink"
 import { OutputLink } from "../links/OutputLink"
 import { StringLink } from "../links/StringLink"
-import { GraphNode } from "./Node"
+import { GraphNode, NodeType } from "./Node"
 
 
 
 export class TxNode implements GraphNode {
     readonly id: string
-    readonly type: "transaction" = "transaction"
+    readonly type = NodeType.Transaction
     scale: number = 1
     x: number | undefined
     y: number | undefined

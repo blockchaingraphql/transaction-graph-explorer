@@ -5,6 +5,13 @@ import { OutputLink } from "./OutputLink"
 
 export type StringLink = AddressLink | ClusterLink | InputLink | OutputLink
 
+
+export enum LinkType {
+    AddressLink,
+    ClusterLink,
+    InputLink,
+    OutputLink,
+}
 /*export abstract class StringLink implements LinkObject {
     public static readonly type: string = "asd"
     public readonly source: StringIdNode

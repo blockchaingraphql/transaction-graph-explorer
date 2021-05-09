@@ -1,12 +1,12 @@
 import { ClusterLink } from "../links/ClusterLink"
 import { StringLink } from "../links/StringLink"
-import { GraphNode } from "./Node"
+import { GraphNode, NodeType } from "./Node"
 
 export class ClusterNode implements GraphNode {
     get id(): string {
         return "X" + this.clusterId
     }
-    readonly type: "cluster" = "cluster"
+    readonly type = NodeType.Cluster
     scale: number = 1
     x: number | undefined
     y: number | undefined

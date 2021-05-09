@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import ForceGraph2D, { NodeObject, LinkObject, ForceGraphMethods } from 'react-force-graph-2d'
-import { StringLink } from './models/links/StringLink'
+import { LinkType, StringLink } from './models/links/StringLink'
 import { StringIdNode } from './models/nodes/Node'
 import { forceCollide } from 'd3-force'
 
@@ -118,17 +118,17 @@ export function BlockchainForceGraph({ onNodeClick,
             const linkStrengthFn = (link: StringLink) => {
 
                 switch (link.type) {
-                    case "ClusterLink":
+                    case LinkType.ClusterLink:
                         return Math.max(0.01, 1 / link.target.addresses.size)
-                    case "AddressLink":
+                    case LinkType.AddressLink:
                         return Math.max(0.01, 1 / link.target.outputs.size)
-                    case "InputLink":
+                    case LinkType.InputLink:
                         if (link.source.spentLink) {
                             return 1
                         } else {
                             return Math.max(0.01, 1 / link.target.inputs.size)
                         }
-                    case "OutputLink":
+                    case LinkType.OutputLink:
                         if (link.target.spentByLink) {
                             return 1
                         } else {

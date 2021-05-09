@@ -1,12 +1,12 @@
 import { ClusterNode } from "./ClusterNode"
-import { GraphNode } from "./Node"
+import { GraphNode, NodeType } from "./Node"
 import { StringLink } from "../links/StringLink"
 import { ClusterLink } from "../links/ClusterLink"
 import { AddressLink } from "../links/AddressLink"
 
 export class AddressNode implements GraphNode {
     readonly id: string
-    readonly type: "address" = "address"
+    readonly type = NodeType.Address//"address" = "address"
     scale: number = 1
     x: number | undefined
     y: number | undefined

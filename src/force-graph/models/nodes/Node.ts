@@ -7,6 +7,13 @@ import { TxNode } from "./TxNode"
 
 export type StringIdNode = AddressNode | ClusterNode | OutputNode | TxNode
 
+export enum NodeType {
+    Transaction,
+    Output,
+    Address,
+    Cluster,
+}
+
 export interface GraphNode extends NodeObject {
     readonly id: string
     scale: number

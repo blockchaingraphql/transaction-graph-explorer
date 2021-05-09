@@ -3,10 +3,8 @@ import { TxNode } from './models/nodes/TxNode'
 import { OutputNode } from './models/nodes/OutputNode'
 import { AddressNode } from './models/nodes/AddressNode'
 import { ClusterNode } from './models/nodes/ClusterNode'
-import { StringLink } from './models/links/StringLink'
-import { StringIdNode } from './models/nodes/Node'
-import { OutputLink } from './models/links/OutputLink'
-import { InputLink } from './models/links/InputLink'
+import { LinkType, StringLink } from './models/links/StringLink'
+import { NodeType, StringIdNode } from './models/nodes/Node'
 import { useGraph } from '../hooks/useGraph'
 import { BlockchainForceGraph } from './BlockchainForceGraph'
 
@@ -60,14 +58,19 @@ function TransactionForceGraph({
 
     const handleClick = useCallback(async (node: StringIdNode, event: MouseEvent) => {
         if (event.button === 2) return
-        if (node instanceof TxNode) {
-            if (transactionClicked) await transactionClicked(node, event)
-        } else if (node instanceof OutputNode) {
-            if (outputClicked) await outputClicked(node, event)
-        } else if (node instanceof AddressNode) {
-            if (addressClicked) await addressClicked(node, event)
-        } else if (node instanceof ClusterNode) {
-            if (clusterClicked) await clusterClicked(node, event)
+        switch (node.type) {
+            case NodeType.Transaction:
+                if (transactionClicked) await transactionClicked(node, event)
+                break
+            case NodeType.Output:
+                if (outputClicked) await outputClicked(node, event)
+                break
+            case NodeType.Address:
+                if (addressClicked) await addressClicked(node, event)
+                break
+            case NodeType.Cluster:
+                if (clusterClicked) await clusterClicked(node, event)
+                break
         }
     }, [transactionClicked, outputClicked, addressClicked, clusterClicked])
 
@@ -76,20 +79,6 @@ function TransactionForceGraph({
     //const [hoveredNode, setHoveredNode] = useState<StringIdNode>();
 
     const nodeHover = useCallback((node: StringIdNode | null, previousNode: StringIdNode | null) => {
-        if (previousNode) {
-            switch (previousNode.type) {
-                case "address":
-                    break
-                case "cluster":
-                    break
-                case "output":
-                    break
-                case "transaction":
-                    break
-                default: throw new Error("wololo")
-            }
-        }
-
 
         if (previousNode) {
             if (div2Ref.current) {
@@ -125,38 +114,44 @@ function TransactionForceGraph({
         if (node.x === undefined || node.y === undefined) {
             return
         }
-        if (node instanceof TxNode) {
-            const coinbase = node.coinbase//(node.spent_outputs.length === 0 && node.outputs.length > 0);
-            ctx.fillStyle = "cyan"
-            ctx.beginPath()
-            ctx.arc(node.x, node.y, 6 * node.scale, 0, 2 * Math.PI, false)
-            ctx.fill()
-            if (coinbase) {
-                ctx.strokeStyle = "steelblue"
-                ctx.lineWidth = 2
-                ctx.stroke()
-            }
-        } else if (node instanceof OutputNode) {
-            const utxo = node.spending_txid === null
-            ctx.beginPath()
-            ctx.fillStyle = "yellow"
-            ctx.arc(node.x, node.y, 6 * node.scale, 0, 2 * Math.PI, false)
-            ctx.fill()
-            if (utxo) {
-                ctx.strokeStyle = "steelblue"
-                ctx.lineWidth = 2
-                ctx.stroke()
-            }
-        } else if (node instanceof AddressNode) {
-            ctx.fillStyle = "lime"
-            ctx.beginPath()
-            ctx.arc(node.x, node.y, 6 * node.scale, 0, 2 * Math.PI, false)
-            ctx.fill()
-        } else if (node instanceof ClusterNode) {
-            ctx.fillStyle = "blue"
-            ctx.beginPath()
-            ctx.arc(node.x, node.y, 6 * node.scale, 0, 2 * Math.PI, false)
-            ctx.fill()
+
+        switch (node.type) {
+            case NodeType.Transaction:
+                const coinbase = node.coinbase//(node.spent_outputs.length === 0 && node.outputs.length > 0);
+                ctx.fillStyle = "cyan"
+                ctx.beginPath()
+                ctx.arc(node.x, node.y, 6 * node.scale, 0, 2 * Math.PI, false)
+                ctx.fill()
+                if (coinbase) {
+                    ctx.strokeStyle = "steelblue"
+                    ctx.lineWidth = 2
+                    ctx.stroke()
+                }
+                break
+            case NodeType.Output:
+                const utxo = node.spending_txid === null
+                ctx.beginPath()
+                ctx.fillStyle = "yellow"
+                ctx.arc(node.x, node.y, 6 * node.scale, 0, 2 * Math.PI, false)
+                ctx.fill()
+                if (utxo) {
+                    ctx.strokeStyle = "steelblue"
+                    ctx.lineWidth = 2
+                    ctx.stroke()
+                }
+                break
+            case NodeType.Address:
+                ctx.fillStyle = "lime"
+                ctx.beginPath()
+                ctx.arc(node.x, node.y, 6 * node.scale, 0, 2 * Math.PI, false)
+                ctx.fill()
+                break
+            case NodeType.Cluster:
+                ctx.fillStyle = "blue"
+                ctx.beginPath()
+                ctx.arc(node.x, node.y, 6 * node.scale, 0, 2 * Math.PI, false)
+                ctx.fill()
+                break
         }
     }, [])
 
@@ -168,38 +163,41 @@ function TransactionForceGraph({
     }, [])
 
     const nodeLabel = useCallback((node: StringIdNode): string => {
-        if (node instanceof TxNode) {
-            const coinbase = node.coinbase//(node.spent_outputs.length === 0 && node.outputs.length > 0);
-            if (coinbase) {
-                return "Coinbase Transaction <br/>" + node.id
-            } else {
-                return "Transaction <br/>" + node.id
-            }
-        } else if (node instanceof OutputNode) {
-            const utxo = node.spending_txid === null
-            if (utxo) {
-                return "Unspent Output <br/>" + node.value
-            } else {
-                return "Output <br/>" + node.value
-            }
-        } if (node instanceof AddressNode) {
-            return "Address <br/>" + node.address
-        } if (node instanceof ClusterNode) {
-            return "Cluster <br/>" + node.clusterId
-        } else {
-            return ""
+        switch (node.type) {
+            case NodeType.Transaction:
+                const coinbase = node.coinbase//(node.spent_outputs.length === 0 && node.outputs.length > 0);
+                if (coinbase) {
+                    return "Coinbase Transaction <br/>" + node.id
+                } else {
+                    return "Transaction <br/>" + node.id
+                }
+            case NodeType.Output:
+                const utxo = node.spending_txid === null
+                if (utxo) {
+                    return "Unspent Output <br/>" + node.value
+                } else {
+                    return "Output <br/>" + node.value
+                }
+            case NodeType.Address:
+                return "Address <br/>" + node.address
+            case NodeType.Cluster:
+                return "Cluster <br/>" + node.clusterId
         }
     }, [])
 
     const particleCount = useCallback((link: StringLink): number => {
         let value
-        if (link instanceof InputLink) {
-            value = link.source.value
-        } else if (link instanceof OutputLink) {
-            value = link.target.value
+        switch (link.type) {
+            case LinkType.InputLink:
+                value = link.source.value
+                break
+            case LinkType.OutputLink:
+                value = link.target.value
+                break
+            default:
+                return 0
         }
-        if (value === undefined) return 0
-        else if (value < 1000) return 1
+        if (value < 1000) return 1
         else if (value < 10000) return 2
         else return 3
     }, [])
@@ -209,29 +207,35 @@ function TransactionForceGraph({
         if (link.target.x === undefined || link.target.y === undefined) return 0
         let length = Math.hypot(link.source.x - link.target.x, link.source.y - link.target.y)
         if (length < 100) length = 100
-
-        if (link instanceof InputLink) {
-            return Math.min(Math.log2(1.01 + link.source.value), 6) / length
-        } else if (link instanceof OutputLink) {
-            return Math.min(Math.log2(1.01 + link.target.value), 6) / length
-        } else {
-            return 0
+        switch (link.type) {
+            case LinkType.InputLink:
+                return Math.min(Math.log2(1.01 + link.source.value), 6) / length
+            case LinkType.OutputLink:
+                return Math.min(Math.log2(1.01 + link.target.value), 6) / length
+            default:
+                return 0
         }
     }, [])
 
     const particleWidth = useCallback((link: StringLink): number => {
-        if (link.source instanceof OutputNode && link.target instanceof TxNode) {
-
-            return Math.max(Math.ceil(Math.log(link.source.value)), 3)//Doubling value results in 1 more particle
-        } else if (link.target instanceof OutputNode && link.source instanceof TxNode) {
-            return Math.max(Math.ceil(Math.log(link.target.value)), 3)
-        } else {
-            return 0
+        switch (link.type) {
+            case LinkType.InputLink:
+                return Math.max(Math.ceil(Math.log(link.source.value)), 3)//Doubling value results in 1 more particle
+            case LinkType.OutputLink:
+                return Math.max(Math.ceil(Math.log(link.target.value)), 3)
+            default:
+                return 0
         }
     }, [])
 
     const dagFilter = useCallback((node: StringIdNode): boolean => {
-        return (node instanceof TxNode || node instanceof OutputNode)
+        switch (node.type) {
+            case NodeType.Transaction:
+            case NodeType.Output:
+                return true
+            default:
+                return false
+        }
     }, [])
 
 
@@ -244,16 +248,14 @@ function TransactionForceGraph({
     }, [])
 
     const linkColor = useCallback((link: StringLink) => {
-        if (link.source instanceof AddressNode) {
-            return "grey"
-        } else if (link.target instanceof AddressNode) {
-            return "grey"
-        } else if (link.source instanceof TxNode) {
-            return "red"
-        } else if (link.target instanceof TxNode) {
-            return "green"
-        } else {
-            return "black"
+        switch (link.type) {
+            case LinkType.AddressLink:
+            case LinkType.ClusterLink:
+                return "grey"
+            case LinkType.OutputLink:
+                return "red"
+            case LinkType.InputLink:
+                return "green"
         }
     }, [])
 
@@ -266,16 +268,13 @@ function TransactionForceGraph({
     }, [])
 
     const linkDash = useCallback((link: StringLink) => {
-        if (link.source instanceof AddressNode) {
-            return DASHED_LINE
-        } else if (link.target instanceof AddressNode) {
-            return DASHED_LINE
-        } else if (link.source instanceof TxNode) {
-            return SOLID_LINE
-        } else if (link.target instanceof TxNode) {
-            return SOLID_LINE
-        } else {
-            return SOLID_LINE
+        switch (link.type) {
+            case LinkType.AddressLink:
+            case LinkType.ClusterLink:
+                return DASHED_LINE
+            case LinkType.OutputLink:
+            case LinkType.InputLink:
+                return SOLID_LINE
         }
     }, [])
     const div2Ref: React.RefObject<HTMLDivElement> = useRef(null)
