@@ -41,7 +41,7 @@ export function Coin({ client }: { client?: ApolloClient<object> }) {
 
     const classes = useStyles()
 
-    let { coin } = useParams<{ coin: string }>()
+    const { coin } = useParams<{ coin: string }>()
 
     const history = useHistory()
     const transactionClicked = useCallback((tx: TxNode, event: MouseEvent) => {
@@ -73,7 +73,7 @@ export function Coin({ client }: { client?: ApolloClient<object> }) {
         }
     }, [coin, history])
 
-    let match = useRouteMatch()
+    const match = useRouteMatch()
 
     const cRef = useRef<HTMLDivElement>(null)
 

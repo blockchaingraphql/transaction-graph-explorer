@@ -154,7 +154,7 @@ const addOutput = (draft: Draft<Graph>, output: OutputNode): void => {
 const removeOutput = (draft: Draft<Graph>, output: OutputNode): void => {
     draft.outputsByOutpoint.delete(output.id)
     if (output.spending_txid) {
-        let txidIdToInputs = draft.txidToInputs.get(output.spending_txid)!
+        const txidIdToInputs = draft.txidToInputs.get(output.spending_txid)!
         console.log("DELETING INPUT OF " + output.spending_txid)
         if (txidIdToInputs.size > 1) {
             txidIdToInputs.delete(output)
@@ -163,7 +163,7 @@ const removeOutput = (draft: Draft<Graph>, output: OutputNode): void => {
         }
     }
     if (output.txid) {
-        let txidIdToOutputs = draft.txidToOutputs.get(output.txid)!
+        const txidIdToOutputs = draft.txidToOutputs.get(output.txid)!
         console.log("DELETING OUTPUT OF " + output.txid)
         if (txidIdToOutputs.size > 1) {
             txidIdToOutputs.delete(output)

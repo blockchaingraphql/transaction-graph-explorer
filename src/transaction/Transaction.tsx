@@ -34,7 +34,7 @@ function TabPanel(props: { children: any, index: number, value: any }) {
 
 
 function TransactionCardContent() {
-    let { coin, txid } = useParams<{ coin: string, txid: string }>()
+    const { coin, txid } = useParams<{ coin: string, txid: string }>()
     const [tabIndex, setTabIndex] = useState(0)
 
     const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
@@ -84,7 +84,7 @@ function TransactionCardContent() {
 }
 
 export function Transaction() {
-    let { txid } = useParams<{ coin: string, txid: string }>()
+    const { txid } = useParams<{ coin: string, txid: string }>()
     //const txNode: TxNode = new TxNode(txid, false);
     const { graph, graphDispatch } = useGraph()
     //const { transaction: graphNode } = useGraphTransaction({ txid: txid })

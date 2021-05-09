@@ -9,7 +9,7 @@ import { useGraph } from "../hooks/useGraph"
 
 
 export function TransactionOutput() {
-    let { txid, coin, n } = useParams<{ coin: string, txid: string, n: string }>()
+    const { txid, coin, n } = useParams<{ coin: string, txid: string, n: string }>()
 
     const { graph, graphDispatch } = useGraph()
     const graphNode = graph.outputsByOutpoint.get(txid + n)

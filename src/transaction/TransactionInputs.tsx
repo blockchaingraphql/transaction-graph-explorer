@@ -11,7 +11,7 @@ import { useGraph } from "../hooks/useGraph"
 
 export function TransactionInputs() {
 
-    let { coin, txid } = useParams<{ coin: string, txid: string }>()
+    const { coin, txid } = useParams<{ coin: string, txid: string }>()
 
     const { graph, graphDispatch } = useGraph()
     const { data, error, loading } = useTransactionInputsQuery({ variables: { coin: coin, txid: txid } })

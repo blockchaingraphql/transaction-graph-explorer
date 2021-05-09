@@ -72,7 +72,7 @@ function TransactionForceGraph({
     }, [transactionClicked, outputClicked, addressClicked, clusterClicked])
 
 
-    let hoveredNode: React.MutableRefObject<StringIdNode | undefined> = useRef()
+    const hoveredNode: React.MutableRefObject<StringIdNode | undefined> = useRef()
     //const [hoveredNode, setHoveredNode] = useState<StringIdNode>();
 
     const nodeHover = useCallback((node: StringIdNode | null, previousNode: StringIdNode | null) => {
@@ -96,10 +96,10 @@ function TransactionForceGraph({
                 div2Ref.current.style.cursor = "default"
             }
             previousNode.scale = 1
-            for (let inLink of previousNode.inLinks()) {
+            for (const inLink of previousNode.inLinks()) {
                 inLink.source.scale = 1
             }
-            for (let outLink of previousNode.outLinks()) {
+            for (const outLink of previousNode.outLinks()) {
                 outLink.target.scale = 1
             }
             //previousNode.fx = previousNode.fy = undefined;
@@ -111,10 +111,10 @@ function TransactionForceGraph({
                 div2Ref.current.style.cursor = "context-menu"
             }
             node.scale = 1.5
-            for (let inLink of node.inLinks()) {
+            for (const inLink of node.inLinks()) {
                 inLink.source.scale = 1.5
             }
-            for (let outLink of node.outLinks()) {
+            for (const outLink of node.outLinks()) {
                 outLink.target.scale = 1.5
             }
             hoveredNode.current = node

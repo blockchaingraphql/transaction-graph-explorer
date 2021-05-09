@@ -109,7 +109,7 @@ export function BlockchainForceGraph({ onNodeClick,
     useEffect(() => {
         const fg = fgRef.current
         if (fg) {
-            let fc = forceCollide(6.5)
+            const fc = forceCollide(6.5)
             fc.strength(1)
             fc.iterations(1)
             fg.d3Force('collide', fc as any);

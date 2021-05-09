@@ -52,7 +52,8 @@
                 "never"
             ],
             "no-unsafe-optional-chaining": "warn",
-            "no-multi-spaces": "error"
+            "no-multi-spaces": "error",
+            "prefer-const": "warn"
         }
     },
     "browserslist": {
