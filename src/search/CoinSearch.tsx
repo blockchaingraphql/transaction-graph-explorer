@@ -11,7 +11,7 @@ export function CoinSearch({ coin, client }: { coin: String, client: ApolloClien
         }
         const searchedNumber = Number(query)
         if (Number.isFinite(searchedNumber) && searchedNumber >= 0 && Number.isInteger(searchedNumber)) {
-            let res = await client.query<CoinSearchNumberQuery>({ query: CoinSearchNumberDocument, variables: { coin: coin, query: searchedNumber } })
+            const res = await client.query<CoinSearchNumberQuery>({ query: CoinSearchNumberDocument, variables: { coin: coin, query: searchedNumber } })
             const block = res.data.coin?.blockByHeight
             if (!block) {
                 return []
@@ -19,7 +19,7 @@ export function CoinSearch({ coin, client }: { coin: String, client: ApolloClien
                 return [{ coin: block.coin.name, type: "block", info: "#" + searchedNumber, value: block.hash }]
             }
         } else {
-            let res = await client.query<CoinSearchStringQuery>({ query: CoinSearchStringDocument, variables: { coin: coin, query: query } })
+            const res = await client.query<CoinSearchStringQuery>({ query: CoinSearchStringDocument, variables: { coin: coin, query: query } })
             const results: SearchResult[] = []
             const coinRes = res.data.coin
             if (!coinRes) return results

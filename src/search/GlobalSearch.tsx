@@ -11,7 +11,7 @@ export function GlobalSearch({ client }: { client: ApolloClient<any> }) {
         }
         const searchedNumber = Number(query)
         if (Number.isFinite(searchedNumber) && searchedNumber >= 0 && Number.isInteger(searchedNumber)) {
-            let res = await client.query<SearchNumberQuery>({ query: SearchNumberDocument, variables: { query: searchedNumber } })
+            const res = await client.query<SearchNumberQuery>({ query: SearchNumberDocument, variables: { query: searchedNumber } })
             return res.data.coins.flatMap(coin => {
                 if (!coin.blockByHeight) {
                     return [] as SearchResult[]
@@ -22,7 +22,7 @@ export function GlobalSearch({ client }: { client: ApolloClient<any> }) {
                 }
             })
         } else {
-            let res = await client.query<SearchStringQuery>({ query: SearchStringDocument, variables: { query: query } })
+            const res = await client.query<SearchStringQuery>({ query: SearchStringDocument, variables: { query: query } })
             return res.data.coins.flatMap(coin => {
                 const results: SearchResult[] = []
                 if (coin.transaction) {

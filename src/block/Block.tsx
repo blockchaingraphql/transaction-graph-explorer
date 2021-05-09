@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom'
 
 export function Block() {
 
-    let { hash, coin } = useParams<{ coin: string, hash: string }>()
+    const { hash, coin } = useParams<{ coin: string, hash: string }>()
     const { data, loading, fetchMore } = useBlockQuery({ variables: { hash: hash, coin: coin, limit: 100 } })
 
 
