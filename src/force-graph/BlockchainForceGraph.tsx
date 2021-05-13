@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react'
 import ForceGraph2D, { NodeObject, LinkObject, ForceGraphMethods } from 'react-force-graph-2d'
 import { LinkType, StringLink } from './models/links/StringLink'
 import { StringIdNode } from './models/nodes/Node'
@@ -24,13 +24,12 @@ interface Props {
     linkWidth?: (link: StringLink) => number
     linkLineDash?: (link: StringLink) => number[]
     dagNodeFilter?: (node: StringIdNode) => boolean
-    //reff: React.MutableRefObject<ForceGraphMethods | undefined>
     graphData?: BlockchainGraphData
     width?: number
     height?: number
 }
 
-export function BlockchainForceGraph({ onNodeClick,
+export const BlockchainForceGraph = React.forwardRef<ForceGraphMethods | undefined, Props>((({ onNodeClick,
     onNodeRightClick,
     onNodeHover,
     nodeCanvasObject,
@@ -44,10 +43,9 @@ export function BlockchainForceGraph({ onNodeClick,
     linkWidth,
     linkLineDash,
     dagNodeFilter,
-    //reff,
-    graphData, width, height, ...rest }: Props) {
-
-
+    graphData,
+    width,
+    height }: Props, ref) => {
     const onNodeClickFn = useMemo(() => {
         return onNodeClick ? (node: NodeObject, event: MouseEvent) => onNodeClick(node as StringIdNode, event) : undefined
     }, [onNodeClick])
@@ -104,6 +102,29 @@ export function BlockchainForceGraph({ onNodeClick,
         return dagNodeFilter ? (node: NodeObject) => dagNodeFilter(node as StringIdNode) : undefined
     }, [dagNodeFilter])
 
+    const linkStrengthFn = useCallback((link: StringLink) => {
+        switch (link.type) {
+            case LinkType.ClusterLink:
+                return Math.max(0.01, 1 / link.target.addresses.size)
+            case LinkType.AddressLink:
+                return Math.max(0.01, 1 / link.target.outputs.size)
+            case LinkType.InputLink:
+                if (link.source.spentLink) {
+                    return 1
+                } else {
+                    return Math.max(0.01, 1 / link.target.inputs.size)
+                }
+            case LinkType.OutputLink:
+                if (link.target.spentByLink) {
+                    return 1
+                } else {
+                    return Math.max(0.01, 1 / link.source.outputs.size)
+                }
+        }
+    }, [])
+
+    const linkoDistanceFn = useCallback((link: StringLink) => 100, [])
+
     const fgRef: React.MutableRefObject<ForceGraphMethods | undefined> = useRef()
 
     useEffect(() => {
@@ -113,33 +134,15 @@ export function BlockchainForceGraph({ onNodeClick,
             fc.strength(1)
             fc.iterations(1)
             fg.d3Force('collide', fc as any);
-            (fg.d3Force('charge') as any).strength(-25)
-            const linkoDistanceFn = (link: StringLink) => 100
-            const linkStrengthFn = (link: StringLink) => {
-
-                switch (link.type) {
-                    case LinkType.ClusterLink:
-                        return Math.max(0.01, 1 / link.target.addresses.size)
-                    case LinkType.AddressLink:
-                        return Math.max(0.01, 1 / link.target.outputs.size)
-                    case LinkType.InputLink:
-                        if (link.source.spentLink) {
-                            return 1
-                        } else {
-                            return Math.max(0.01, 1 / link.target.inputs.size)
-                        }
-                    case LinkType.OutputLink:
-                        if (link.target.spentByLink) {
-                            return 1
-                        } else {
-                            return Math.max(0.01, 1 / link.source.outputs.size)
-                        }
-                }
-            }
+            (fg.d3Force('charge') as any).strength(-25);
             (fg.d3Force('link') as any).strength(linkStrengthFn)
             fg.d3Force('center', null!);
             (fg.d3Force('link') as any).distance(linkoDistanceFn)
         }
+    })
+
+    useImperativeHandle(ref, () => {
+        return fgRef.current
     })
 
     return <ForceGraph2D
@@ -171,4 +174,4 @@ export function BlockchainForceGraph({ onNodeClick,
         height={height}
         ref={fgRef}
     />
-}
+}))

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { OutputNode } from "./force-graph/models/nodes/OutputNode"
 import { TxNode } from "./force-graph/models/nodes/TxNode"
 import { AddressNode } from "./force-graph/models/nodes/AddressNode"
-import TransactionForceGraph from "./force-graph/TransactionForceGraph"
+import { TransactionForceGraph } from "./force-graph/TransactionForceGraph"
 import { Transaction } from "./transaction/Transaction"
 import { ApolloClient, ApolloConsumer } from '@apollo/client'
 import { Block } from "./block/Block"
@@ -22,6 +22,7 @@ import { ClusterNode } from "./force-graph/models/nodes/ClusterNode"
 import { CoinSearch } from "./search/CoinSearch"
 import { TransactionOutput } from "./transaction-output/TransactionOutput"
 import { GraphContext, useGraphReducer } from "./hooks/useGraphReducer"
+import { ForceGraphMethods } from "react-force-graph-2d"
 
 const useStyles = makeStyles((theme) => ({
     link: {
@@ -47,7 +48,6 @@ export function Coin({ client }: { client?: ApolloClient<object> }) {
     const transactionClicked = useCallback((tx: TxNode, event: MouseEvent) => {
         if (event.button === 0) {//Left click
             history.push("/" + coin + "/transaction/" + tx.id)
-            //expandTransaction(tx);
         }
     }, [coin, history])
 
@@ -63,7 +63,6 @@ export function Coin({ client }: { client?: ApolloClient<object> }) {
     const outputClicked = useCallback(async (node: OutputNode, event: MouseEvent) => {
         if (event.button === 0) {//Left click
             history.push("/" + coin + "/output/" + node.txid + "-" + node.n)
-            //expandOutput(node);
         }
     }, [coin, history])
 
@@ -92,8 +91,17 @@ export function Coin({ client }: { client?: ApolloClient<object> }) {
         }
     }, [graphDimensions, setGraphDimensions])
 
+
+    const fgRef: React.MutableRefObject<ForceGraphMethods | undefined> = useRef()
+
+    const centerAt = (x: number, y: number, t?: number) => {
+        if (fgRef.current) {
+            fgRef.current.centerAt(x, y, t)
+        }
+    }
+
     return <div style={{ display: "flex", flexDirection: "row", height: "100%" }}>
-        <GraphContext.Provider value={{ graph: graph, graphDispatch: graphDispatch }}>
+        <GraphContext.Provider value={{ graph: graph, graphDispatch: graphDispatch, centerAt: centerAt }}>
             <div style={{ flex: "0 1 auto", height: "100%", width: "50%", resize: "horizontal", overflow: "auto", display: "flex", flexDirection: "column" }}>
                 <div style={{ flex: "0 0 auto", display: "flex", flexDirection: "row" }}>
                     <Breadcrumbs aria-label="breadcrumb" style={{ flex: "1 0 auto", display: "flex", marginRight: "1ch" }}>
@@ -124,11 +132,7 @@ export function Coin({ client }: { client?: ApolloClient<object> }) {
                 </div>
                 <Switch>
                     <Route path={`${match.path}/transaction/:txid`}>
-                        <Transaction
-                        //outputsByOutpoint={outputsByOutpoint}
-                        //setTransactionsByTxid={setTransactionsByTxid}
-                        //setOutputsByOutpoint={setOutputsByOutpoint} 
-                        />
+                        <Transaction />
                     </Route>
                     <Route path={`${match.path}/output/:txid-:n`}>
                         <TransactionOutput />
@@ -151,10 +155,7 @@ export function Coin({ client }: { client?: ApolloClient<object> }) {
             </div>
             <div style={{ flex: "1 1 0", height: "100%", backgroundColor: "blue", overflow: 'hidden' }} ref={cRef}>
                 {graphDimensions && <TransactionForceGraph
-                    /*transactionsByTxid={transactionsByTxid}
-                    outputsByOutpoint={outputsByOutpoint}
-                    addressesById={outputAddressesAndClusters.updatedAddresses}
-                    clustersById={outputAddressesAndClusters.updatedClusters}*/
+                    ref={fgRef}
                     transactionClicked={transactionClicked}
                     outputClicked={outputClicked}
                     addressClicked={addressClicked}

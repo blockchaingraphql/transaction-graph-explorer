@@ -11,7 +11,7 @@ import { ClusterNode } from "../force-graph/models/nodes/ClusterNode"
 import { OutputNode } from "../force-graph/models/nodes/OutputNode"
 import { TxNode } from "../force-graph/models/nodes/TxNode"
 
-export const GraphContext = createContext<{ graph: Graph, graphDispatch: React.Dispatch<GraphAction> } | undefined>(undefined)
+export const GraphContext = createContext<{ graph: Graph, graphDispatch: React.Dispatch<GraphAction>, centerAt: (x: number, y: number, t?: number) => void } | undefined>(undefined)
 
 const graphReducer: Reducer<Graph, GraphAction> = (draft, action) => {
     switch (action.type) {
@@ -80,7 +80,6 @@ const removeAddress = (draft: Draft<Graph>, address: AddressNode): void => {
         delete outputLink.source.addressLink
     }
 }
-
 
 const addOutput = (draft: Draft<Graph>, output: OutputNode): void => {
     if (draft.outputsByOutpoint.has(output.id)) return
@@ -175,10 +174,7 @@ const removeOutput = (draft: Draft<Graph>, output: OutputNode): void => {
             removeAddress(draft, output.addressLink.target)
         }
     }
-
-    //Delete inLinks, outLink, if output then delete address and cluster if they have no other connections
 }
-
 
 interface AddTransactionAction {
     type: "addTransaction"

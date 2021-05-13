@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useImperativeHandle, useMemo, useRef } from 'react'
 import { TxNode } from './models/nodes/TxNode'
 import { OutputNode } from './models/nodes/OutputNode'
 import { AddressNode } from './models/nodes/AddressNode'
@@ -7,6 +7,7 @@ import { LinkType, StringLink } from './models/links/StringLink'
 import { NodeType, StringIdNode } from './models/nodes/Node'
 import { useGraph } from '../hooks/useGraph'
 import { BlockchainForceGraph } from './BlockchainForceGraph'
+import { ForceGraphMethods } from 'react-force-graph-2d'
 
 const DASHED_LINE: number[] = [4, 4]
 const SOLID_LINE: [] = []
@@ -18,10 +19,10 @@ interface Props {
     clusterClicked?: (node: ClusterNode, event: MouseEvent) => any,
     onNodeContextMenu?: (e: { node: StringIdNode, mouseEvent: React.MouseEvent<HTMLDivElement, MouseEvent> }) => any
     width: number,
-    height: number
+    height: number,
 }
 
-function TransactionForceGraph({
+export const TransactionForceGraph = React.forwardRef<ForceGraphMethods | undefined, Props>(({
     transactionClicked,
     outputClicked,
     addressClicked,
@@ -29,11 +30,9 @@ function TransactionForceGraph({
     onNodeContextMenu,
     width,
     height
-}: Props
-) {
+}: Props, ref) => {
 
     const { graph } = useGraph()
-
     const dimensions = useMemo(() => {
         return { width: width, height: height }
     }, [width, height])
@@ -74,9 +73,7 @@ function TransactionForceGraph({
         }
     }, [transactionClicked, outputClicked, addressClicked, clusterClicked])
 
-
     const hoveredNode: React.MutableRefObject<StringIdNode | undefined> = useRef()
-    //const [hoveredNode, setHoveredNode] = useState<StringIdNode>();
 
     const nodeHover = useCallback((node: StringIdNode | null, previousNode: StringIdNode | null) => {
 
@@ -91,9 +88,7 @@ function TransactionForceGraph({
             for (const outLink of previousNode.outLinks()) {
                 outLink.target.scale = 1
             }
-            //previousNode.fx = previousNode.fy = undefined;
             hoveredNode.current = undefined
-            //setHoveredNode(undefined);
         }
         if (node) {
             if (div2Ref.current) {
@@ -279,8 +274,6 @@ function TransactionForceGraph({
     }, [])
     const div2Ref: React.RefObject<HTMLDivElement> = useRef(null)
 
-    //const [contextMenuNode, setContextMenuNode] = useState<StringIdNode>();
-
     const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         if (div2Ref.current) {
             div2Ref.current.style.cursor = "default"
@@ -289,13 +282,17 @@ function TransactionForceGraph({
         if (hoveredNode.current) {
             if (onNodeContextMenu) {
                 onNodeContextMenu({ node: hoveredNode.current, mouseEvent: e })
-                //setContextMenuNode(hoveredNode.current);
             }
         }
     }, [onNodeContextMenu])
 
+    const fgRef: React.MutableRefObject<ForceGraphMethods | undefined> = useRef()
+
+    useImperativeHandle(ref, () => {
+        return fgRef.current
+    })
+
     return <div
-        //style={{ height: "100%", width: "100%" }}
         ref={div2Ref}
         onContextMenu={onContextMenu}>
         <BlockchainForceGraph
@@ -316,10 +313,7 @@ function TransactionForceGraph({
             linkDirectionalParticleWidth={particleWidth}
             linkWidth={linkWidth}
             linkLineDash={linkDash}
-        //reff={fgRef}
+            ref={fgRef}
         />
     </div>
-}
-
-
-export default memo(TransactionForceGraph)
+})

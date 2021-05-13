@@ -7,15 +7,12 @@ import { Index, IndexRange, InfiniteLoader, TableCellProps } from 'react-virtual
 import { Fragment, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
-
 export function Block() {
 
     const { hash, coin } = useParams<{ coin: string, hash: string }>()
     const { data, loading, fetchMore } = useBlockQuery({ variables: { hash: hash, coin: coin, limit: 100 } })
 
-
     const loading2 = useRef(false)
-
 
     const loadMoreRows = async (params: IndexRange): Promise<any> => {
         if (loading || loading2.current) return
@@ -31,7 +28,6 @@ export function Block() {
         if (!data?.coin?.block) return false
         return params.index < data.coin.block.transactions.items.length
     }
-
 
     return <Card style={{ flex: "1 1 auto", width: "100%", display: "flex", flexDirection: "column" }}>
         <CardHeader title="BLOCK" subheader={hash} />

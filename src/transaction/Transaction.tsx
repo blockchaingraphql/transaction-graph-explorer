@@ -9,7 +9,7 @@ import { TransactionOutputs } from "./TransactionOutputs"
 import { useState } from "react"
 import { AutoSizer, Dimensions, Size } from "react-virtualized"
 import { useGraph } from "../hooks/useGraph"
-
+import CenterFocusStrongIcon from '@material-ui/icons/CenterFocusStrong'
 
 function TabPanel(props: { children: any, index: number, value: any }) {
     const { children, value, index, ...other } = props
@@ -31,7 +31,6 @@ function TabPanel(props: { children: any, index: number, value: any }) {
         </div>
     )
 }
-
 
 function TransactionCardContent() {
     const { coin, txid } = useParams<{ coin: string, txid: string }>()
@@ -85,11 +84,9 @@ function TransactionCardContent() {
 
 export function Transaction() {
     const { txid } = useParams<{ coin: string, txid: string }>()
-    //const txNode: TxNode = new TxNode(txid, false);
-    const { graph, graphDispatch } = useGraph()
-    //const { transaction: graphNode } = useGraphTransaction({ txid: txid })
-    const graphNode = graph.transactionsByTxid.get(txid)
+    const { graph, graphDispatch, centerAt } = useGraph()
 
+    const graphNode = graph.transactionsByTxid.get(txid)
 
     const addButtonClicked = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         graphDispatch({ type: "addTransaction", node: new TxNode(txid, false) })
@@ -97,7 +94,6 @@ export function Transaction() {
 
     const removeButtonClicked = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         if (graphNode) graphDispatch({ type: "removeTransaction", node: graphNode })
-        //props.setTransactionsByTxid(props.transactionsByTxid.delete(txid))
     }
 
     return <Card style={{ flex: "1 1 auto", display: "flex", flexDirection: "column" }}>
@@ -118,6 +114,13 @@ export function Transaction() {
                     <RemoveIcon />
                 </IconButton>
             </Tooltip>}
+            <IconButton aria-label="remove from graph" onClick={(e) => {
+                if (graphNode && graphNode.x && graphNode.y) {
+                    centerAt(graphNode.x, graphNode.y, 1000)
+                }
+            }}>
+                <CenterFocusStrongIcon />
+            </IconButton>
         </CardActions>
     </Card>
 }
