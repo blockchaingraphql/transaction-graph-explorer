@@ -1,8 +1,10 @@
-import { Card, CardContent, CardHeader, Paper, Tab, Tabs } from "@material-ui/core"
+import { Card, CardActions, CardContent, CardHeader, IconButton, Paper, Tab, Tabs, Tooltip } from "@material-ui/core"
 import { useState } from "react"
 import { useParams } from "react-router-dom"
 import { AddressOverview } from "./AddressOverview"
 import { AddressTransactions } from "./AddressTransactions"
+import CenterFocusStrongIcon from '@material-ui/icons/CenterFocusStrong'
+import { useGraph } from "../hooks/useGraph"
 
 
 
@@ -19,6 +21,9 @@ export function Address() {
     }
 
 
+    const { graph, graphDispatch, centerAt } = useGraph()
+
+    const graphNode = graph.addressesById.get(address)
 
 
     return <Card style={{ flex: "1 1 auto", width: "100%", display: "flex", flexDirection: "column" }}>
@@ -35,5 +40,14 @@ export function Address() {
                 {tabIndex === 2 && 'BALANCE CHART TODO'}
             </Paper>
         </CardContent>
+        <CardActions>
+            {graphNode && <Tooltip title="Add to graph" aria-label="highlight">
+                <IconButton aria-label="remove from graph" onClick={(event) => {
+                    if (graphNode.x && graphNode.y) centerAt(graphNode.x, graphNode.y, 1000)
+                }}>
+                    <CenterFocusStrongIcon />
+                </IconButton>
+            </Tooltip>}
+        </CardActions>
     </Card >
 }
