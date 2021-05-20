@@ -21,7 +21,7 @@ export function Address() {
     }
 
 
-    const { graph, graphDispatch, centerAt } = useGraph()
+    const { graph, centerAt } = useGraph()
 
     const graphNode = graph.addressesById.get(address)
 

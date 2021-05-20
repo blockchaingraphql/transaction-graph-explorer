@@ -2,12 +2,14 @@ import { Fragment, useRef } from "react"
 import { Link, useParams } from "react-router-dom"
 import { Index, IndexRange, InfiniteLoader, TableCellProps } from "react-virtualized"
 import { useAddressTransactionsQuery } from "../generated/graphql"
+import { useGraph } from "../hooks/useGraph"
 import { MuiVirtualizedTable } from "../MuiVirtualizedTable"
 
 export function AddressTransactions() {
 
     const { address, coin } = useParams<{ coin: string, address: string }>()
     const { data, loading, fetchMore } = useAddressTransactionsQuery({ variables: { address: address, coin: coin, limit: 300 } })
+    const { graph } = useGraph()
     const loading2 = useRef(false)
     if (!data) return <div>"Loading..."</div>
 
@@ -41,7 +43,8 @@ export function AddressTransactions() {
                     rowCount={data!.coin!.address.confirmedTransactions.items.length}
                     rowGetter={(info) => {
                         const ct = data!.coin!.address.confirmedTransactions.items[info.index]
-                        return { txid: ct.confirmedTransaction.txid, time: new Date(ct.timestamp).toLocaleString(), balanceChange: ct.balanceChange }
+                        const graphNode = graph.transactionsByTxid.get(ct.confirmedTransaction.txid)
+                        return { txid: ct.confirmedTransaction.txid, time: new Date(ct.timestamp).toLocaleString(), balanceChange: ct.balanceChange, selected: graphNode !== undefined }
                     }}
                     headerHeight={48}
                     rowHeight={48}

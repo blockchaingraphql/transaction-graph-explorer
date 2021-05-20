@@ -41,7 +41,7 @@ export function TransactionOutputs() {
                             {output.scriptPubKey.addresses?.map(address => <Link key={address.address} to={"/" + coin + "/address/" + address.address}>{address.address}</Link>)} ({output.value})
 
                             {output.spendingInput &&
-                                <IconButton component={Link} to={"/" + coin + "/transaction/" + output.spendingInput.spendingTxid} aria-label="spending input">
+                                <IconButton component={Link} to={"/" + coin + "/transaction/" + output.spendingInput.spendingTxid + "?i=" + output.spendingInput.spendingIndex} aria-label="spending input">
                                     <ChevronRightIcon />
                                 </IconButton>}
                             {!output.spendingInput &&
@@ -49,8 +49,8 @@ export function TransactionOutputs() {
                                     <ChevronRightIcon />
                                 </IconButton>}
                             <div style={{ flexGrow: 1 }}></div>
-                            {!graphNode && <Tooltip title="Add to graph" aria-label="highlight">
-                                <IconButton aria-label="add to graph" onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                            {!graphNode && <Tooltip title="Add to graph">
+                                <IconButton onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                     graphDispatch({
                                         type: "addOutput", node: new OutputNode({
                                             txid: txid,
@@ -65,8 +65,8 @@ export function TransactionOutputs() {
                                     <AddIcon />
                                 </IconButton>
                             </Tooltip>}
-                            {graphNode && <Tooltip title="Add to graph" aria-label="highlight">
-                                <IconButton aria-label="remove from graph" onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                            {graphNode && <Tooltip title="Remove from graph">
+                                <IconButton onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                     graphDispatch({ type: "removeOutput", node: graphNode })
                                 }}>
                                     <RemoveIcon />

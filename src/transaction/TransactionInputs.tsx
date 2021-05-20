@@ -39,7 +39,7 @@ export function TransactionInputs() {
                             const graphNode = graph.outputsByOutpoint.get(outpoint)
 
                             return <div key={outpoint} style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-                                <IconButton component={RouterLink} to={"/" + coin + "/transaction/" + input.spentOutput!.txid} aria-label="spending input">
+                                <IconButton component={RouterLink} to={"/" + coin + "/transaction/" + input.spentOutput!.txid + "?o=" + input.spentOutput.n} aria-label="spending input">
                                     <ChevronLeftIcon />
                                 </IconButton>
                                 {input.spentOutput!.scriptPubKey.addresses?.map(address => <Link to={"/" + coin + "/address/" + address.address} key={address.address}>{address.address}</Link>)} ({input.spentOutput!.value})
@@ -60,7 +60,7 @@ export function TransactionInputs() {
                                         <AddIcon />
                                     </IconButton>
                                 </Tooltip>}
-                                {graphNode && <Tooltip title="Add to graph" aria-label="highlight">
+                                {graphNode && <Tooltip title="Remove from graph" aria-label="highlight">
                                     <IconButton aria-label="remove from graph" onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                         graphDispatch({ type: "removeOutput", node: graphNode })
                                     }}>

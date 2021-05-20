@@ -35,6 +35,9 @@ const styles = (theme: Theme) => createStyles({
     noClick: {
         cursor: 'initial',
     },
+    selected: {
+        backgroundColor: 'rgba(220, 0, 78, 0.08)'
+    }
 })
 
 interface Props extends WithStyles<typeof styles> {
@@ -60,7 +63,7 @@ function VirtualizedTable({ columns, classes, rowHeight, headerHeight, onRowClic
             return clsx(classes.tableRow, classes.flexContainer)
         } else {
             return clsx(classes.fullWidth, classes.tableRow, classes.flexContainer, {
-                [classes.tableRowHover]: onRowClick != null,
+                [classes.tableRowHover]: onRowClick != null
             })
         }
     }
@@ -71,11 +74,13 @@ function VirtualizedTable({ columns, classes, rowHeight, headerHeight, onRowClic
 
     const cellRenderer = (props: TableCellProps) => {
         //const { columns, classes, rowHeight, onRowClick } = this.props;
+        console.log("CELLRENDER ROWDATA", props.rowData)
         return (
             <TableCell
                 component="div"
                 className={clsx(classes.tableCell, classes.flexContainer, {
                     [classes.noClick]: onRowClick == null,
+                    [classes.selected]: props.rowData.selected
                 })}
                 variant="body"
                 style={{ height: rowHeight, maxWidth: '100%' }}
